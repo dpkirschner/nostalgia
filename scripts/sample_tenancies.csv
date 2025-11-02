@@ -1,0 +1,6 @@
+location_id,business_name,category,start_date,end_date,is_current
+1,Coffee Shop A,cafe,2010-01-01,2015-06-30,false
+1,Bookstore B,retail,2015-08-01,,true
+2,Restaurant C,restaurant,2005-03-15,2020-12-31,false
+2,Tech Startup D,office,2021-02-01,,true
+3,Vintage Clothing Store,retail,2000-01-01,2018-09-30,false
