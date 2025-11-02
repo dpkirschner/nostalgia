@@ -50,6 +50,9 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index('idx_locations_lat_lon', 'locations', ['lat', 'lon'], unique=False)
+    op.create_index('idx_locations_lat', 'locations', ['lat'], unique=False)
+    op.create_index('idx_locations_lon', 'locations', ['lon'], unique=False)
+    op.create_index('idx_locations_last_seen', 'locations', ['last_seen'], unique=False)
 
     op.create_table(
         'tenancies',
@@ -66,6 +69,7 @@ def upgrade() -> None:
         sa.PrimaryKeyConstraint('id')
     )
     op.create_index('idx_tenancies_location_id', 'tenancies', ['location_id'], unique=False)
+    op.create_index('idx_tenancies_location_id_is_current', 'tenancies', ['location_id', 'is_current'], unique=False)
 
     op.create_table(
         'memory_submissions',
@@ -102,8 +106,12 @@ def downgrade() -> None:
     op.drop_index('idx_memory_submissions_status', table_name='memory_submissions')
     op.drop_index('idx_memory_submissions_location_id', table_name='memory_submissions')
     op.drop_table('memory_submissions')
+    op.drop_index('idx_tenancies_location_id_is_current', table_name='tenancies')
     op.drop_index('idx_tenancies_location_id', table_name='tenancies')
     op.drop_table('tenancies')
+    op.drop_index('idx_locations_last_seen', table_name='locations')
+    op.drop_index('idx_locations_lon', table_name='locations')
+    op.drop_index('idx_locations_lat', table_name='locations')
     op.drop_index('idx_locations_lat_lon', table_name='locations')
     op.drop_table('locations')
     op.drop_table('kc_food_inspections', schema='staging')
