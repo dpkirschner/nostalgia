@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from prometheus_client import Counter
 
-from app.db.session import get_db
-from app.models.location import Location
-from app.models.tenancy import Tenancy
-from app.schemas.location import LocationDetail, LocationsResponse, PinOut, TimelineEntry
+from app.db.supabase import get_db
+from app.services.location_service import LocationService
+from app.repositories.location_repository import BoundingBox
+from app.schemas.location import LocationDetail, LocationsResponse, PinOut
 
 router = APIRouter(prefix="/v1/locations", tags=["locations"])
 
@@ -21,12 +20,16 @@ detail_view_counter = Counter(
 )
 
 
+def get_location_service(session: AsyncSession = Depends(get_db)) -> LocationService:
+    return LocationService(session)
+
+
 @router.get("", response_model=LocationsResponse)
 async def get_locations(
     bbox: str = Query(..., description="Bounding box: west,south,east,north"),
     limit: int = Query(300, ge=1, le=1000),
     cursor: str | None = Query(None),
-    db: AsyncSession = Depends(get_db),
+    service: LocationService = Depends(get_location_service),
 ):
     try:
         coords = [float(x) for x in bbox.split(",")]
@@ -45,42 +48,17 @@ async def get_locations(
             detail=f"Invalid bbox format. Expected 'west,south,east,north': {str(e)}"
         )
 
-    query = text("""
-        SELECT
-            l.id,
-            l.lat,
-            l.lon,
-            l.address,
-            v.business_name as current_business,
-            v.category as current_category
-        FROM locations l
-        LEFT JOIN v_latest_tenancy v ON l.id = v.location_id
-        WHERE l.lat BETWEEN :south AND :north
-          AND l.lon BETWEEN :west AND :east
-        ORDER BY l.id
-        LIMIT :limit
-    """)
-
-    result = await db.execute(
-        query,
-        {
-            "south": south,
-            "north": north,
-            "west": west,
-            "east": east,
-            "limit": limit
-        }
-    )
-    rows = result.fetchall()
+    bounding_box = BoundingBox(west, south, east, north)
+    rows = await service.find_locations_in_area(bounding_box, limit)
 
     pins = [
         PinOut(
-            id=row.id,
-            lat=row.lat,
-            lon=row.lon,
-            address=row.address,
-            current_business=row.current_business,
-            current_category=row.current_category,
+            id=row["id"],
+            lat=row["lat"],
+            lon=row["lon"],
+            address=row["address"],
+            current_business=row["current_business"],
+            current_category=row["current_category"],
         )
         for row in rows
     ]
@@ -97,45 +75,13 @@ async def get_locations(
 @router.get("/{location_id}", response_model=LocationDetail)
 async def get_location_detail(
     location_id: int,
-    db: AsyncSession = Depends(get_db),
+    service: LocationService = Depends(get_location_service),
 ):
-    result = await db.execute(
-        select(Location).where(Location.id == location_id)
-    )
-    location = result.scalar_one_or_none()
+    location = await service.get_location_by_id(location_id)
 
     if not location:
         raise HTTPException(status_code=404, detail="Location not found")
 
-    result = await db.execute(
-        select(Tenancy)
-        .where(Tenancy.location_id == location_id)
-        .order_by(
-            Tenancy.is_current.desc(),
-            Tenancy.end_date.desc().nulls_first(),
-            Tenancy.created_at.desc()
-        )
-        .limit(3)
-    )
-    tenancies = result.scalars().all()
-
-    timeline = [
-        TimelineEntry(
-            business_name=t.business_name,
-            category=t.category,
-            start_date=t.start_date,
-            end_date=t.end_date,
-            is_current=t.is_current,
-        )
-        for t in tenancies
-    ]
-
     detail_view_counter.inc()
 
-    return LocationDetail(
-        id=location.id,
-        lat=location.lat,
-        lon=location.lon,
-        address=location.address,
-        timeline=timeline,
-    )
+    return location
