@@ -6,7 +6,7 @@ from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.api import locations, memories
 from app.core.config import settings
-from app.db.supabase import check_db_connection
+from app.db.postgres import check_db_connection
 from app.middleware.logging import JSONLoggingMiddleware
 from app.middleware.rate_limit import RateLimitMiddleware
 

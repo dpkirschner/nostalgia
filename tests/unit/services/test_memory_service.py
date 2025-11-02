@@ -9,7 +9,7 @@ class TestMemoryService:
     @pytest.fixture
     def service(self, mock_async_session, mock_memory_repository):
         with patch(
-            "app.services.memory_service.SupabaseMemoryRepository",
+            "app.services.memory_service.PostgresMemoryRepository",
             return_value=mock_memory_repository,
         ):
             return MemoryService(mock_async_session)

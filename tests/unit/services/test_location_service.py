@@ -10,10 +10,10 @@ class TestLocationService:
     @pytest.fixture
     def service(self, mock_async_session, mock_location_repository, mock_tenancy_repository):
         with patch(
-            "app.services.location_service.SupabaseLocationRepository",
+            "app.services.location_service.PostgresLocationRepository",
             return_value=mock_location_repository,
         ), patch(
-            "app.services.location_service.SupabaseTenancyRepository",
+            "app.services.location_service.PostgresTenancyRepository",
             return_value=mock_tenancy_repository,
         ):
             return LocationService(mock_async_session)

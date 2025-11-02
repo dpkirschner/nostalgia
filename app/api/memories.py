@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from prometheus_client import Counter
 
-from app.db.supabase import get_db
+from app.db.postgres import get_db
 from app.services.memory_service import MemoryService
 from app.schemas.memory import MemorySubmissionCreate, MemorySubmissionResponse
 

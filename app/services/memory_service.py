@@ -2,7 +2,7 @@ from typing import Sequence
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.memory_repository import IMemoryRepository
-from app.db.supabase.supabase_memory_repository import SupabaseMemoryRepository
+from app.db.postgres.postgres_memory_repository import PostgresMemoryRepository
 from app.schemas.memory import MemorySubmissionCreate, MemorySubmissionResponse
 from app.models.memory_submission import MemorySubmission
 
@@ -10,7 +10,7 @@ from app.models.memory_submission import MemorySubmission
 class MemoryService:
     def __init__(self, session: AsyncSession):
         self._session = session
-        self._memory_repo: IMemoryRepository = SupabaseMemoryRepository(session)
+        self._memory_repo: IMemoryRepository = PostgresMemoryRepository(session)
 
     async def submit_memory(
         self, memory_data: MemorySubmissionCreate

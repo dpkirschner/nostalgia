@@ -3,16 +3,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.repositories.location_repository import ILocationRepository, BoundingBox
 from app.repositories.tenancy_repository import ITenancyRepository
-from app.db.supabase.supabase_location_repository import SupabaseLocationRepository
-from app.db.supabase.supabase_tenancy_repository import SupabaseTenancyRepository
+from app.db.postgres.postgres_location_repository import PostgresLocationRepository
+from app.db.postgres.postgres_tenancy_repository import PostgresTenancyRepository
 from app.schemas.location import LocationDetail, TimelineEntry
 
 
 class LocationService:
     def __init__(self, session: AsyncSession):
         self._session = session
-        self._location_repo: ILocationRepository = SupabaseLocationRepository(session)
-        self._tenancy_repo: ITenancyRepository = SupabaseTenancyRepository(session)
+        self._location_repo: ILocationRepository = PostgresLocationRepository(session)
+        self._tenancy_repo: ITenancyRepository = PostgresTenancyRepository(session)
 
     async def get_location_by_id(self, location_id: int) -> Optional[LocationDetail]:
         location = await self._location_repo.get_by_id(location_id)

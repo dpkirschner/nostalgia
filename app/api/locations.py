@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from prometheus_client import Counter
 
-from app.db.supabase import get_db
+from app.db.postgres import get_db
 from app.services.location_service import LocationService
 from app.repositories.location_repository import BoundingBox
 from app.schemas.location import LocationDetail, LocationsResponse, PinOut
