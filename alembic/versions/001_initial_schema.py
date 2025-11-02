@@ -18,12 +18,34 @@ depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
+    op.execute("CREATE SCHEMA IF NOT EXISTS staging")
+
+    op.create_table(
+        'kc_food_inspections',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('business_name', sa.String(length=255), nullable=False),
+        sa.Column('address', sa.String(length=255), nullable=True),
+        sa.Column('city', sa.String(length=100), nullable=True),
+        sa.Column('state', sa.String(length=2), nullable=True),
+        sa.Column('zip', sa.String(length=10), nullable=True),
+        sa.Column('latitude', sa.Float(), nullable=True),
+        sa.Column('longitude', sa.Float(), nullable=True),
+        sa.Column('inspection_date', sa.Date(), nullable=True),
+        sa.Column('raw_line', sa.Text(), nullable=True),
+        sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
+        sa.PrimaryKeyConstraint('id'),
+        schema='staging'
+    )
+
     op.create_table(
         'locations',
-        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('id', sa.String(length=64), nullable=False),
         sa.Column('lat', sa.Float(), nullable=False),
         sa.Column('lon', sa.Float(), nullable=False),
         sa.Column('address', sa.String(length=500), nullable=False),
+        sa.Column('parcel_pin', sa.String(length=50), nullable=True),
+        sa.Column('source', sa.String(length=100), nullable=False),
+        sa.Column('last_seen', sa.Date(), nullable=False),
         sa.Column('created_at', sa.DateTime(timezone=True), server_default=sa.text('now()'), nullable=False),
         sa.PrimaryKeyConstraint('id')
     )
@@ -32,9 +54,9 @@ def upgrade() -> None:
     op.create_table(
         'tenancies',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('location_id', sa.Integer(), nullable=False),
+        sa.Column('location_id', sa.String(length=64), nullable=False),
         sa.Column('business_name', sa.String(length=255), nullable=False),
-        sa.Column('category', sa.String(length=100), nullable=True),
+        sa.Column('category', sa.String(length=100), nullable=False, server_default='restaurant'),
         sa.Column('start_date', sa.Date(), nullable=True),
         sa.Column('end_date', sa.Date(), nullable=True),
         sa.Column('is_current', sa.Boolean(), nullable=False, server_default='false'),
@@ -48,7 +70,7 @@ def upgrade() -> None:
     op.create_table(
         'memory_submissions',
         sa.Column('id', sa.Integer(), nullable=False),
-        sa.Column('location_id', sa.Integer(), nullable=False),
+        sa.Column('location_id', sa.String(length=64), nullable=False),
         sa.Column('business_name', sa.String(length=255), nullable=False),
         sa.Column('start_year', sa.Integer(), nullable=True),
         sa.Column('end_year', sa.Integer(), nullable=True),
@@ -84,3 +106,5 @@ def downgrade() -> None:
     op.drop_table('tenancies')
     op.drop_index('idx_locations_lat_lon', table_name='locations')
     op.drop_table('locations')
+    op.drop_table('kc_food_inspections', schema='staging')
+    op.execute("DROP SCHEMA IF EXISTS staging CASCADE")
