@@ -4,7 +4,7 @@ import { logEvent, TelemetryEvents } from '@/lib/telemetry'
 import { LocationDetailSkeleton } from './LocationDetailSkeleton'
 import { LocationDetailError } from './LocationDetailError'
 import { LocationDetailTimeline } from './LocationDetailTimeline'
-import { MemoryFormStub } from './MemoryFormStub'
+import { MemoryForm } from './MemoryForm'
 import type { ApiError } from '@/types/api'
 
 type DrawerView = 'timeline' | 'memory-form'
@@ -61,7 +61,7 @@ export function LocationDetailDrawer({
 
   if (view === 'memory-form') {
     return (
-      <MemoryFormStub locationId={locationId} onBack={handleBackToTimeline} />
+      <MemoryForm locationId={locationId} onBack={handleBackToTimeline} />
     )
   }
 

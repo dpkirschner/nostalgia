@@ -95,6 +95,9 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
   const getDrawerTitle = () => {
     if (showBanner) return 'Welcome'
     if (geo.error) return 'Location unavailable'
+    if (selectedLocationId && drawerView === 'memory-form') {
+      return 'Add a Memory'
+    }
     if (selectedLocationId && locationDetail) {
       const currentBusiness = locationDetail.timeline.find((t) => t.is_current)
         ?.business_name
