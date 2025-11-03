@@ -1,11 +1,14 @@
 import { ReactNode } from 'react'
 import type { MapBounds, MapInstance } from './map'
+import type { Pin } from './location'
 
 export interface MapCanvasProps {
   center: { lat: number; lon: number }
   zoom: number
+  pins?: Pin[]
   onIdle?: (bounds: MapBounds) => void
   onReady?: (map: MapInstance) => void
+  onPinClick?: (pin: Pin) => void
 }
 
 export interface PrimaryFABProps {

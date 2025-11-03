@@ -6,9 +6,18 @@ import { BottomDrawer } from '../ui/BottomDrawer'
 import { GeolocationBanner } from '../ui/GeolocationBanner'
 import { GeolocationButton } from '../map/GeolocationButton'
 import { useGeolocation } from '../../hooks/useGeolocation'
+import { useLocations } from '../../hooks/useLocations'
 import { isOnboardingDismissed } from '../../lib/storage'
 import { getErrorMessage } from '../../lib/geolocationMessages'
-import { DEFAULT_CENTER, DEFAULT_ZOOM, USER_ZOOM } from '../../config/map'
+import {
+  DEFAULT_CENTER,
+  DEFAULT_ZOOM,
+  USER_ZOOM,
+  MIN_ZOOM_FOR_PINS,
+  MAX_PINS_PER_REQUEST,
+} from '../../config/map'
+import type { MapBounds, MapInstance } from '../../types/map'
+import type { Pin } from '../../types/location'
 
 interface AppLayoutProps {
   drawerContent?: ReactNode
@@ -17,7 +26,22 @@ interface AppLayoutProps {
 export function AppLayout({ drawerContent }: AppLayoutProps) {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showBanner, setShowBanner] = useState(false)
+  const [bounds, setBounds] = useState<MapBounds | null>(null)
+  const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM)
+  const [selectedLocationId, setSelectedLocationId] = useState<number | null>(
+    null
+  )
   const geo = useGeolocation()
+
+  const shouldFetchPins = bounds !== null && currentZoom >= MIN_ZOOM_FOR_PINS
+  const { data: locationsData } = useLocations(
+    shouldFetchPins ? bounds : null,
+    MAX_PINS_PER_REQUEST
+  )
+
+  if (import.meta.env.DEV && selectedLocationId) {
+    console.log('[Selected Location]', selectedLocationId)
+  }
 
   useEffect(() => {
     if (geo.consent === 'unset' && !isOnboardingDismissed()) {
@@ -34,6 +58,25 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
 
   const handleBannerDismiss = () => {
     setShowBanner(false)
+  }
+
+  const handleMapIdle = (newBounds: MapBounds) => {
+    setBounds(newBounds)
+  }
+
+  const handlePinClick = (pin: Pin) => {
+    setSelectedLocationId(pin.id)
+    setDrawerOpen(true)
+    if (import.meta.env.DEV) {
+      console.log('[Pin Clicked]', { location_id: pin.id, address: pin.address })
+    }
+  }
+
+  const handleMapReady = (map: MapInstance) => {
+    setCurrentZoom(map.getZoom())
+    map.on('zoomend', () => {
+      setCurrentZoom(map.getZoom())
+    })
   }
 
   const drawerTitle = showBanner
@@ -80,7 +123,14 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
-      <MapCanvas center={mapCenter} zoom={mapZoom} />
+      <MapCanvas
+        center={mapCenter}
+        zoom={mapZoom}
+        pins={locationsData?.locations}
+        onIdle={handleMapIdle}
+        onReady={handleMapReady}
+        onPinClick={handlePinClick}
+      />
 
       <Logo />
 
