@@ -21,7 +21,7 @@ export function LocationDetailDrawer({
   onViewChange,
 }: LocationDetailDrawerProps) {
   const [loadStartTime] = useState(() => Date.now())
-  const { data, isLoading, isError, error, refetch } =
+  const { data, isLoading, isFetching, isError, error, refetch } =
     useLocationDetail(locationId)
 
   useEffect(() => {
@@ -83,10 +83,13 @@ export function LocationDetailDrawer({
     return null
   }
 
+  const isRefreshing = isFetching && !isLoading
+
   return (
     <LocationDetailTimeline
       timeline={data.timeline}
       onAddMemory={handleAddMemory}
+      isRefreshing={isRefreshing}
     />
   )
 }

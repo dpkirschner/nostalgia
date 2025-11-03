@@ -1,22 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
+import { useEffect, useRef } from 'react'
 import { getLocations } from '../lib/api/locations'
 import { QUERY_STALE_TIME } from '../config/api'
+import { roundBounds, pinsHaveChanged } from '../lib/cache/bboxUtils'
+import { bboxCacheLimiter } from '../lib/cache/bboxCacheLimiter'
 import type { MapBounds } from '../types/map'
-
-function roundBounds(bounds: MapBounds, precision: number = 3): MapBounds {
-  return {
-    north: Number(bounds.north.toFixed(precision)),
-    south: Number(bounds.south.toFixed(precision)),
-    east: Number(bounds.east.toFixed(precision)),
-    west: Number(bounds.west.toFixed(precision)),
-  }
-}
+import type { Pin } from '../types/location'
 
 export function useLocations(bounds: MapBounds | null, limit: number = 300) {
   const roundedBounds = bounds ? roundBounds(bounds) : null
+  const queryKey = ['locations', roundedBounds]
+  const previousPins = useRef<Pin[]>()
 
-  return useQuery({
-    queryKey: ['locations', roundedBounds],
+  const query = useQuery({
+    queryKey,
     queryFn: ({ signal }) => {
       if (!roundedBounds) {
         throw new Error('Bounds are required')
@@ -34,5 +31,23 @@ export function useLocations(bounds: MapBounds | null, limit: number = 300) {
     },
     enabled: bounds !== null,
     staleTime: QUERY_STALE_TIME.PINS,
+    select: (data) => {
+      const pins = data.locations
+      const hasChanged = pinsHaveChanged(previousPins.current, pins)
+
+      if (hasChanged) {
+        previousPins.current = pins
+      }
+
+      return data
+    },
   })
+
+  useEffect(() => {
+    if (query.isSuccess && roundedBounds) {
+      bboxCacheLimiter.trackBboxQuery(queryKey)
+    }
+  }, [query.isSuccess, queryKey])
+
+  return query
 }
