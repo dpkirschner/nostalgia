@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "FastAPI backend for Nostalgia - What Used To Be Here"
 authors = ["Daniel Kirschner"]
 readme = "README.md"
+package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.11"
