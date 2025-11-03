@@ -3,17 +3,14 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: nostalgia_postgres
     ports:
       - "5432:5432"
-    environment:
-      - POSTGRES_USER=nostalgia
-      - POSTGRES_PASSWORD=nostalgia_dev
-      - POSTGRES_DB=nostalgia
+    env_file:
+      - .env
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nostalgia"]
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -23,10 +20,6 @@ services:
     build: .
     ports:
       - "8080:8080"
-    environment:
-      - DATABASE_URL=postgresql+asyncpg://nostalgia:nostalgia_dev@postgres:5432/nostalgia
-      - CORS_ORIGINS=["http://localhost:3000"]
-      - LOG_LEVEL=INFO
     env_file:
       - .env
     depends_on:
