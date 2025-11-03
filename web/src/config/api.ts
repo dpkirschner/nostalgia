@@ -1,0 +1,19 @@
+export const API_TIMEOUT_MS = 8000
+
+export const CACHE_TTL = {
+  PINS_MS: 60 * 1000,
+  LOCATION_DETAIL_MS: 15 * 60 * 1000,
+} as const
+
+export const RETRY_CONFIG = {
+  MAX_RETRIES: 1,
+  RETRY_DELAY_MS: 300,
+  RETRY_STATUS_CODES: [408, 429, 500, 502, 503, 504],
+} as const
+
+export const QUERY_STALE_TIME = {
+  PINS: CACHE_TTL.PINS_MS,
+  LOCATION_DETAIL: CACHE_TTL.LOCATION_DETAIL_MS,
+} as const
+
+export const QUERY_GC_TIME_MS = 5 * 60 * 1000
