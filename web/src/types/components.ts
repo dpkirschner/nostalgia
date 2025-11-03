@@ -1,6 +1,8 @@
 import { ReactNode } from "react";
 
 export interface MapCanvasProps {
+  center: { lat: number; lon: number };
+  zoom: number;
   onIdle?: (bounds: unknown) => void;
   onReady?: (mapRef: unknown) => void;
 }
