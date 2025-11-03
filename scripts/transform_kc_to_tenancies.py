@@ -229,22 +229,16 @@ async def group_into_tenancy_candidates(
     return tenancy_candidates
 
 
-def calculate_is_current(
-    end_date: Optional[date], recent_months: int
-) -> bool:
+def calculate_is_current(end_date: Optional[date], recent_months: int) -> bool:
     """Accurately calculates if a tenancy is current."""
     if end_date is None:
         return False
 
-    cutoff_date = datetime.now().date() - relativedelta(
-        months=recent_months
-    )
+    cutoff_date = datetime.now().date() - relativedelta(months=recent_months)
     return end_date >= cutoff_date
 
 
-async def upsert_tenancies(
-    session: AsyncSession, candidates: List[Dict], stats: TransformStats
-):
+async def upsert_tenancies(session: AsyncSession, candidates: List[Dict], stats: TransformStats):
     """
     Performs a single, batch "upsert" for a list of tenancy candidates.
     """
@@ -255,9 +249,7 @@ async def upsert_tenancies(
     values_list = []
 
     for candidate in candidates:
-        is_current = calculate_is_current(
-            candidate["end_date"], recent_months
-        )
+        is_current = calculate_is_current(candidate["end_date"], recent_months)
         values_list.append(
             {
                 "location_id": candidate["location_id"],
@@ -321,18 +313,14 @@ async def enforce_consistency(session: AsyncSession, stats: TransformStats):
     )
 
     update_multi_current_stmt = (
-        update(Tenancy)
-        .where(Tenancy.id.in_(subquery))
-        .values(is_current=False)
+        update(Tenancy).where(Tenancy.id.in_(subquery)).values(is_current=False)
     )
 
     result = await session.execute(update_multi_current_stmt)
     fixes += result.rowcount
 
     # 2. Fix outdated tenancies
-    outdated_cutoff = datetime.now().date() - relativedelta(
-        months=settings.outdated_tenancy_months
-    )
+    outdated_cutoff = datetime.now().date() - relativedelta(months=settings.outdated_tenancy_months)
 
     update_outdated_stmt = (
         update(Tenancy)
@@ -434,9 +422,7 @@ async def transform_kc_to_tenancies(batch_size: int = 4000):
         logger.info("Fetching normalized inspections from staging.v_kc_norm...")
         inspections = await fetch_normalized_inspections(session)
         stats.source_rows = len(inspections)
-        logger.info(
-            f"Fetched {stats.source_rows} normalized inspection records"
-        )
+        logger.info(f"Fetched {stats.source_rows} normalized inspection records")
 
         if stats.source_rows == 0:
             logger.warning("\nNo data to process. Exiting.")
@@ -449,7 +435,6 @@ async def transform_kc_to_tenancies(batch_size: int = 4000):
         logger.info(f"Created {len(tenancy_candidates)} tenancy candidates")
         await session.commit()  # Commit new locations
         logger.info(f"Committed {stats.locations_created} new locations.")
-
 
         logger.info("\nUpserting tenancies (with batch logic)...")
         for i in range(0, len(tenancy_candidates), batch_size):
@@ -476,11 +461,9 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
         format="%(asctime)s - %(levelname)s - %(message)s",
-        handlers=[
-            logging.StreamHandler()
-        ],
+        handlers=[logging.StreamHandler()],
     )
-    
+
     # Example: get batch size from settings or keep default
     batch_size = getattr(settings, "ETL_BATCH_SIZE", 4000)
 
@@ -489,12 +472,8 @@ if __name__ == "__main__":
     logger.info("=" * 80)
     logger.info(f"\nConfiguration:")
     logger.info(f"  Round places: {settings.round_places}")
-    logger.info(
-        f"  Recent months threshold: {settings.recent_months}"
-    )
-    logger.info(
-        f"  Outdated tenancy months: {settings.outdated_tenancy_months}"
-    )
+    logger.info(f"  Recent months threshold: {settings.recent_months}")
+    logger.info(f"  Outdated tenancy months: {settings.outdated_tenancy_months}")
     logger.info(f"  Batch size: {batch_size}")
     logger.info("\n" + "-" * 80 + "\n")
 

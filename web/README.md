@@ -9,6 +9,7 @@ React + TypeScript + Vite frontend for "What Used To Be Here" - tracking busines
 This app uses **MapLibre GL** for interactive maps with **OpenStreetMap (OSM)** tiles.
 
 **Important:** OSM tile usage is subject to the [OSM Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/):
+
 - Must include proper attribution
 - Limited to light usage (testing/development)
 - For production, consider using a third-party tile provider (Mapbox, MapTiler, Stadia Maps, etc.)
