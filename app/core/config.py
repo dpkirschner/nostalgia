@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     database_url: str
     cors_origins: list[str] = ["*"]
     log_level: str = "INFO"
+    log_format: str = "pretty"
 
 
 settings = Settings()

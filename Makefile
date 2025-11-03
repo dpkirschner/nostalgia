@@ -1,4 +1,4 @@
-.PHONY: help install test test-unit test-integration lint format check clean docker-up docker-down docker-logs db-migrate db-upgrade db-downgrade db-revision load-data run dev
+.PHONY: help install test test-unit test-integration lint format check clean docker-up docker-down docker-logs docker-restart db-migrate db-upgrade db-downgrade db-revision load-data run dev
 
 .DEFAULT_GOAL := help
 
@@ -17,6 +17,7 @@ help:
 	@echo "  make docker-up            Start docker containers"
 	@echo "  make docker-down          Stop docker containers"
 	@echo "  make docker-logs          Follow docker logs"
+	@echo "  make docker-restart       Stop, rebuild, and start containers (foreground)"
 	@echo "  make docker-clean         Stop containers and remove volumes"
 	@echo "  make db-migrate           Run alembic migrations (upgrade)"
 	@echo "  make db-upgrade           Upgrade database to head"
@@ -81,6 +82,11 @@ docker-down:
 
 docker-logs:
 	docker-compose logs -f
+
+docker-restart:
+	docker-compose down
+	docker-compose build
+	docker-compose up
 
 docker-clean:
 	docker-compose down -v

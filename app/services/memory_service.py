@@ -5,6 +5,9 @@ from app.repositories.memory_repository import IMemoryRepository
 from app.db.postgres.postgres_memory_repository import PostgresMemoryRepository
 from app.schemas.memory import MemorySubmissionCreate, MemorySubmissionResponse
 from app.models.memory_submission import MemorySubmission
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class MemoryService:
@@ -15,6 +18,10 @@ class MemoryService:
     async def submit_memory(
         self, memory_data: MemorySubmissionCreate
     ) -> MemorySubmissionResponse:
+        logger.info(
+            f"Submitting memory for location {memory_data.location_id}: {memory_data.business_name}"
+        )
+
         memory = MemorySubmission(
             location_id=memory_data.location_id,
             business_name=memory_data.business_name,
@@ -28,6 +35,7 @@ class MemoryService:
 
         created = await self._memory_repo.create(memory)
         await self._session.commit()
+        logger.info(f"Memory submission created with id {created.id}")
 
         return MemorySubmissionResponse(
             id=created.id,

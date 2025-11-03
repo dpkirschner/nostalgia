@@ -6,6 +6,9 @@ from app.repositories.tenancy_repository import ITenancyRepository
 from app.db.postgres.postgres_location_repository import PostgresLocationRepository
 from app.db.postgres.postgres_tenancy_repository import PostgresTenancyRepository
 from app.schemas.location import LocationDetail, TimelineEntry
+from app.core.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class LocationService:
@@ -17,6 +20,7 @@ class LocationService:
     async def get_location_by_id(self, location_id: int) -> Optional[LocationDetail]:
         location = await self._location_repo.get_by_id(location_id)
         if not location:
+            logger.info(f"Location not found: {location_id}")
             return None
 
         tenancies = await self._tenancy_repo.find_by_location(location_id, limit=3)
@@ -43,7 +47,10 @@ class LocationService:
     async def find_locations_in_area(
         self, bbox: BoundingBox, limit: int = 300
     ) -> Sequence[dict]:
-        return await self._location_repo.find_with_current_tenancy(bbox, limit)
+        logger.debug(f"Finding locations in area: {bbox}, limit={limit}")
+        locations = await self._location_repo.find_with_current_tenancy(bbox, limit)
+        logger.info(f"Found {len(locations)} locations in area")
+        return locations
 
     async def create_location(
         self, lat: float, lon: float, address: str
@@ -52,10 +59,13 @@ class LocationService:
 
         existing = await self._location_repo.find_by_coordinates(lat, lon)
         if existing:
+            logger.info(f"Location already exists at coordinates: ({lat}, {lon})")
             return await self.get_location_by_id(existing.id)
 
+        logger.info(f"Creating new location at ({lat}, {lon}): {address}")
         location = Location(lat=lat, lon=lon, address=address)
         created = await self._location_repo.create(location)
         await self._session.commit()
+        logger.info(f"Successfully created location {created.id}")
 
         return await self.get_location_by_id(created.id)
