@@ -6,9 +6,7 @@ from app.repositories.memory_repository import IMemoryRepository
 from app.models.memory_submission import MemorySubmission
 
 
-class SupabaseMemoryRepository(
-    SupabaseRepository[MemorySubmission, int], IMemoryRepository
-):
+class SupabaseMemoryRepository(SupabaseRepository[MemorySubmission, int], IMemoryRepository):
     def __init__(self, session):
         super().__init__(session, MemorySubmission)
 

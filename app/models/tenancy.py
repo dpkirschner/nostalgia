@@ -26,6 +26,4 @@ class Tenancy(Base):
 
     location: Mapped["Location"] = relationship("Location", back_populates="tenancies")
 
-    __table_args__ = (
-        Index("idx_tenancies_location_id", "location_id"),
-    )
+    __table_args__ = (Index("idx_tenancies_location_id", "location_id"),)

@@ -10,9 +10,7 @@ class TestSupabaseRepository:
     def repository(self, mock_async_session):
         return SupabaseRepository(mock_async_session, Location)
 
-    async def test_get_by_id_returns_entity(
-        self, repository, mock_async_session, sample_location
-    ):
+    async def test_get_by_id_returns_entity(self, repository, mock_async_session, sample_location):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = sample_location
         mock_async_session.execute.return_value = mock_result
@@ -22,9 +20,7 @@ class TestSupabaseRepository:
         assert result == sample_location
         mock_async_session.execute.assert_called_once()
 
-    async def test_get_by_id_returns_none_when_not_found(
-        self, repository, mock_async_session
-    ):
+    async def test_get_by_id_returns_none_when_not_found(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = None
         mock_async_session.execute.return_value = mock_result
@@ -33,9 +29,7 @@ class TestSupabaseRepository:
 
         assert result is None
 
-    async def test_get_all_returns_list(
-        self, repository, mock_async_session, sample_location
-    ):
+    async def test_get_all_returns_list(self, repository, mock_async_session, sample_location):
         mock_result = MagicMock()
         mock_scalars = MagicMock()
         mock_scalars.all.return_value = [sample_location]
@@ -77,9 +71,7 @@ class TestSupabaseRepository:
         assert result.lat == 37.8
         mock_async_session.flush.assert_called_once()
 
-    async def test_update_returns_none_when_not_found(
-        self, repository, mock_async_session
-    ):
+    async def test_update_returns_none_when_not_found(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = None
         mock_async_session.execute.return_value = mock_result
@@ -90,9 +82,7 @@ class TestSupabaseRepository:
 
         assert result is None
 
-    async def test_delete_returns_true_when_deleted(
-        self, repository, mock_async_session
-    ):
+    async def test_delete_returns_true_when_deleted(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_result.rowcount = 1
         mock_async_session.execute.return_value = mock_result
@@ -101,9 +91,7 @@ class TestSupabaseRepository:
 
         assert result is True
 
-    async def test_delete_returns_false_when_not_found(
-        self, repository, mock_async_session
-    ):
+    async def test_delete_returns_false_when_not_found(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_result.rowcount = 0
         mock_async_session.execute.return_value = mock_result
@@ -112,9 +100,7 @@ class TestSupabaseRepository:
 
         assert result is False
 
-    async def test_exists_returns_true_when_found(
-        self, repository, mock_async_session
-    ):
+    async def test_exists_returns_true_when_found(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_result.scalar.return_value = 1
         mock_async_session.execute.return_value = mock_result
@@ -123,9 +109,7 @@ class TestSupabaseRepository:
 
         assert result is True
 
-    async def test_exists_returns_false_when_not_found(
-        self, repository, mock_async_session
-    ):
+    async def test_exists_returns_false_when_not_found(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_result.scalar.return_value = 0
         mock_async_session.execute.return_value = mock_result

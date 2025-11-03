@@ -28,9 +28,7 @@ class TestLocationEndpoints:
         app.dependency_overrides[get_location_service] = lambda: mock_location_service
 
         try:
-            response = await async_client.get(
-                "/v1/locations?bbox=-122.5,37.7,-122.4,37.8"
-            )
+            response = await async_client.get("/v1/locations?bbox=-122.5,37.7,-122.4,37.8")
 
             assert response.status_code == 200
             data = response.json()
@@ -59,9 +57,7 @@ class TestLocationEndpoints:
         app.dependency_overrides[get_location_service] = lambda: mock_location_service
 
         try:
-            response = await async_client.get(
-                "/v1/locations?bbox=-122.5,37.7,-122.4,37.8"
-            )
+            response = await async_client.get("/v1/locations?bbox=-122.5,37.7,-122.4,37.8")
 
             assert response.status_code == 200
             data = response.json()
@@ -119,9 +115,7 @@ class TestLocationEndpoints:
         finally:
             app.dependency_overrides.clear()
 
-    async def test_get_location_detail_not_found(
-        self, async_client, mock_location_service
-    ):
+    async def test_get_location_detail_not_found(self, async_client, mock_location_service):
         mock_location_service.get_location_by_id.return_value = None
 
         app.dependency_overrides[get_location_service] = lambda: mock_location_service

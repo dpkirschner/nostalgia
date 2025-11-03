@@ -21,9 +21,7 @@ class ILocationRepository(IRepository[Location, int]):
         pass
 
     @abstractmethod
-    async def find_in_bounding_box(
-        self, bbox: BoundingBox, limit: int = 300
-    ) -> Sequence[Location]:
+    async def find_in_bounding_box(self, bbox: BoundingBox, limit: int = 300) -> Sequence[Location]:
         pass
 
     @abstractmethod

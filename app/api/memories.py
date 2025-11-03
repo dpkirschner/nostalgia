@@ -9,9 +9,7 @@ from app.schemas.memory import MemorySubmissionCreate, MemorySubmissionResponse
 router = APIRouter(prefix="/v1/memories", tags=["memories"])
 
 memory_submission_counter = Counter(
-    "wutbh_memory_submissions_total",
-    "Total number of memory submissions",
-    ["source"]
+    "wutbh_memory_submissions_total", "Total number of memory submissions", ["source"]
 )
 
 

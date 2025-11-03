@@ -26,22 +26,17 @@ class SupabaseTenancyRepository(SupabaseRepository[Tenancy, int], ITenancyReposi
         return result.scalars().all()
 
     async def find_current_by_location(self, location_id: int) -> Sequence[Tenancy]:
-        stmt = (
-            select(self._model)
-            .where(
-                and_(
-                    self._model.location_id == location_id,
-                    self._model.is_current == True,
-                )
+        stmt = select(self._model).where(
+            and_(
+                self._model.location_id == location_id,
+                self._model.is_current == True,
             )
         )
         result = await self._session.execute(stmt)
         return result.scalars().all()
 
     async def find_by_business_name(self, business_name: str) -> Sequence[Tenancy]:
-        stmt = select(self._model).where(
-            self._model.business_name.ilike(f"%{business_name}%")
-        )
+        stmt = select(self._model).where(self._model.business_name.ilike(f"%{business_name}%"))
         result = await self._session.execute(stmt)
         return result.scalars().all()
 

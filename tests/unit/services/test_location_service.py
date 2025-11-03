@@ -9,12 +9,15 @@ from app.schemas.location import LocationDetail, TimelineEntry
 class TestLocationService:
     @pytest.fixture
     def service(self, mock_async_session, mock_location_repository, mock_tenancy_repository):
-        with patch(
-            "app.services.location_service.PostgresLocationRepository",
-            return_value=mock_location_repository,
-        ), patch(
-            "app.services.location_service.PostgresTenancyRepository",
-            return_value=mock_tenancy_repository,
+        with (
+            patch(
+                "app.services.location_service.PostgresLocationRepository",
+                return_value=mock_location_repository,
+            ),
+            patch(
+                "app.services.location_service.PostgresTenancyRepository",
+                return_value=mock_tenancy_repository,
+            ),
         ):
             return LocationService(mock_async_session)
 
@@ -77,13 +80,9 @@ class TestLocationService:
 
         assert len(result) == 1
         assert result[0]["id"] == 1
-        mock_location_repository.find_with_current_tenancy.assert_called_once_with(
-            bbox, 300
-        )
+        mock_location_repository.find_with_current_tenancy.assert_called_once_with(bbox, 300)
 
-    async def test_find_locations_in_area_empty_results(
-        self, service, mock_location_repository
-    ):
+    async def test_find_locations_in_area_empty_results(self, service, mock_location_repository):
         mock_location_repository.find_with_current_tenancy.return_value = []
 
         bbox = BoundingBox(west=0.0, south=0.0, east=1.0, north=1.0)

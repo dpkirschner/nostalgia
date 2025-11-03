@@ -8,9 +8,7 @@ from prometheus_client import Counter
 
 
 rate_limited_counter = Counter(
-    "wutbh_rate_limited_total",
-    "Total number of rate limited requests",
-    ["endpoint"]
+    "wutbh_rate_limited_total", "Total number of rate limited requests", ["endpoint"]
 )
 
 
@@ -37,9 +35,7 @@ class TokenBucket:
 class RateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app):
         super().__init__(app)
-        self.buckets: dict[tuple[str, str], TokenBucket] = defaultdict(
-            lambda: TokenBucket(0, 0)
-        )
+        self.buckets: dict[tuple[str, str], TokenBucket] = defaultdict(lambda: TokenBucket(0, 0))
 
         self.limits = {
             "GET": (100, 300),
@@ -74,8 +70,8 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                 detail={
                     "error": "Rate limit exceeded",
                     "endpoint": endpoint_key,
-                    "retry_after": 60
-                }
+                    "retry_after": 60,
+                },
             )
 
         return await call_next(request)

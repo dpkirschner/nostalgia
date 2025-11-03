@@ -67,8 +67,12 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         assert mock_session.add_all.called
@@ -89,7 +93,9 @@ class TestKcFoodInspectionsLoader:
         raw_data = json.loads(inspection.raw_line)
         assert raw_data["Name"] == "STARBUCKS"
 
-    async def test_load_defaults_state_to_wa(self, tmp_path, mock_async_session_local, mock_session):
+    async def test_load_defaults_state_to_wa(
+        self, tmp_path, mock_async_session_local, mock_session
+    ):
         csv_content = (
             '"Name","Address","City","Zip Code","Latitude","Longitude","Inspection Date"\n'
             '"TACO BELL","789 BROADWAY","SEATTLE","98103","-122.3500","47.6200","11/18/2024"\n'
@@ -97,15 +103,21 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         added_inspections = mock_session.add_all.call_args[0][0]
         assert len(added_inspections) == 1
         assert added_inspections[0].state == "WA"
 
-    async def test_skips_rows_with_missing_business_name(self, tmp_path, mock_async_session_local, mock_session):
+    async def test_skips_rows_with_missing_business_name(
+        self, tmp_path, mock_async_session_local, mock_session
+    ):
         csv_content = (
             '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"\n'
             '"","123 MAIN ST","SEATTLE","WA","98101","-122.3321","47.6062","08/15/2025"\n'
@@ -114,15 +126,21 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         if mock_session.add_all.called:
             added_inspections = mock_session.add_all.call_args[0][0]
             assert len(added_inspections) == 0
 
-    async def test_skips_rows_with_missing_address(self, tmp_path, mock_async_session_local, mock_session):
+    async def test_skips_rows_with_missing_address(
+        self, tmp_path, mock_async_session_local, mock_session
+    ):
         csv_content = (
             '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"\n'
             '"BURGER KING","","SEATTLE","WA","98102","-122.3400","47.6100","03/24/2025"\n'
@@ -131,15 +149,21 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         if mock_session.add_all.called:
             added_inspections = mock_session.add_all.call_args[0][0]
             assert len(added_inspections) == 0
 
-    async def test_skips_rows_with_missing_coordinates(self, tmp_path, mock_async_session_local, mock_session):
+    async def test_skips_rows_with_missing_coordinates(
+        self, tmp_path, mock_async_session_local, mock_session
+    ):
         csv_content = (
             '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"\n'
             '"RESTAURANT A","100 1ST AVE","SEATTLE","WA","98101","","-122.3321","08/15/2025"\n'
@@ -149,15 +173,21 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         if mock_session.add_all.called:
             added_inspections = mock_session.add_all.call_args[0][0]
             assert len(added_inspections) == 0
 
-    async def test_skips_rows_with_invalid_coordinates(self, tmp_path, mock_async_session_local, mock_session):
+    async def test_skips_rows_with_invalid_coordinates(
+        self, tmp_path, mock_async_session_local, mock_session
+    ):
         csv_content = (
             '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"\n'
             '"RESTAURANT A","100 1ST AVE","SEATTLE","WA","98101","invalid","-122.3321","08/15/2025"\n'
@@ -166,15 +196,21 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         if mock_session.add_all.called:
             added_inspections = mock_session.add_all.call_args[0][0]
             assert len(added_inspections) == 0
 
-    async def test_date_parsing_multiple_formats(self, tmp_path, mock_async_session_local, mock_session):
+    async def test_date_parsing_multiple_formats(
+        self, tmp_path, mock_async_session_local, mock_session
+    ):
         csv_content = (
             '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"\n'
             '"CAFE A","100 1ST AVE","SEATTLE","WA","98101","-122.3321","47.6062","08/15/2025"\n'
@@ -185,8 +221,12 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         added_inspections = mock_session.add_all.call_args[0][0]
@@ -205,8 +245,12 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         added_inspections = mock_session.add_all.call_args[0][0]
@@ -229,14 +273,20 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file), batch_size=1000)
 
         assert mock_session.add_all.call_count == 3
         assert mock_session.commit.call_count == 3
 
-    async def test_batch_processing_partial_final_batch(self, tmp_path, mock_async_session_local, mock_session):
+    async def test_batch_processing_partial_final_batch(
+        self, tmp_path, mock_async_session_local, mock_session
+    ):
         rows = [
             '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"'
         ]
@@ -249,26 +299,38 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file), batch_size=1000)
 
         assert mock_session.add_all.call_count == 2
         assert mock_session.commit.call_count == 2
 
     async def test_empty_csv_file(self, tmp_path, mock_async_session_local, mock_session):
-        csv_content = '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"\n'
+        csv_content = (
+            '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"\n'
+        )
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         assert not mock_session.add_all.called
         assert not mock_session.commit.called
 
-    async def test_mixed_valid_and_invalid_rows(self, tmp_path, mock_async_session_local, mock_session):
+    async def test_mixed_valid_and_invalid_rows(
+        self, tmp_path, mock_async_session_local, mock_session
+    ):
         csv_content = (
             '"Name","Address","City","State","Zip Code","Latitude","Longitude","Inspection Date"\n'
             '"VALID RESTAURANT","100 MAIN ST","SEATTLE","WA","98101","-122.3321","47.6062","08/15/2025"\n'
@@ -280,8 +342,12 @@ class TestKcFoodInspectionsLoader:
         csv_file = tmp_path / "test.csv"
         csv_file.write_text(csv_content)
 
-        with patch('scripts.load_kc_food_inspections.AsyncSessionLocal', return_value=mock_async_session_local):
+        with patch(
+            "scripts.load_kc_food_inspections.AsyncSessionLocal",
+            return_value=mock_async_session_local,
+        ):
             from scripts.load_kc_food_inspections import load_kc_food_inspections
+
             await load_kc_food_inspections(str(csv_file))
 
         added_inspections = mock_session.add_all.call_args[0][0]

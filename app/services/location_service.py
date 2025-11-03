@@ -44,17 +44,13 @@ class LocationService:
             timeline=timeline,
         )
 
-    async def find_locations_in_area(
-        self, bbox: BoundingBox, limit: int = 300
-    ) -> Sequence[dict]:
+    async def find_locations_in_area(self, bbox: BoundingBox, limit: int = 300) -> Sequence[dict]:
         logger.debug(f"Finding locations in area: {bbox}, limit={limit}")
         locations = await self._location_repo.find_with_current_tenancy(bbox, limit)
         logger.info(f"Found {len(locations)} locations in area")
         return locations
 
-    async def create_location(
-        self, lat: float, lon: float, address: str
-    ) -> LocationDetail:
+    async def create_location(self, lat: float, lon: float, address: str) -> LocationDetail:
         from app.models.location import Location
 
         existing = await self._location_repo.find_by_coordinates(lat, lon)

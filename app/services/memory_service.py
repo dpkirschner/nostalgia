@@ -15,9 +15,7 @@ class MemoryService:
         self._session = session
         self._memory_repo: IMemoryRepository = PostgresMemoryRepository(session)
 
-    async def submit_memory(
-        self, memory_data: MemorySubmissionCreate
-    ) -> MemorySubmissionResponse:
+    async def submit_memory(self, memory_data: MemorySubmissionCreate) -> MemorySubmissionResponse:
         logger.info(
             f"Submitting memory for location {memory_data.location_id}: {memory_data.business_name}"
         )

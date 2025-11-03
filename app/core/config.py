@@ -10,5 +10,8 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_format: str = "pretty"
 
+    round_places: int = 6
+    recent_months: int = 18
+
 
 settings = Settings()

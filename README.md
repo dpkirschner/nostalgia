@@ -160,6 +160,101 @@ Rollback one migration:
 poetry run alembic downgrade -1
 ```
 
+## Data Loading & ETL
+
+### Loading Food Inspection Data
+
+Load raw King County food inspection data into staging:
+
+```bash
+make load-data
+```
+
+This loads data from `data/Food_Establishment_Inspection_Data_20251101.csv` into `staging.kc_food_inspections`.
+
+### Transforming to Locations & Tenancies
+
+Transform staging data into normalized `locations` and `tenancies` tables:
+
+```bash
+make transform-data
+```
+
+**Optional**: Specify a custom batch size (default 5000):
+```bash
+poetry run python scripts/transform_kc_to_tenancies.py 10000
+```
+
+### Normalization Rules
+
+The ETL process applies the following normalization rules:
+
+**Business Names:**
+- Converted to uppercase
+- Leading/trailing whitespace trimmed
+- Internal whitespace collapsed to single spaces
+- Applied by `staging.v_kc_norm` view
+
+**Addresses:**
+- Leading/trailing whitespace trimmed
+- Internal whitespace collapsed
+- Case preserved for display
+- Applied by `staging.v_kc_norm` view
+
+**Coordinates (Lat/Lon):**
+- Rounded to 6 decimal places (~0.1 meter precision)
+- Used for location identity matching
+- Applied by `staging.v_kc_norm` view
+- Configurable via `ROUND_PLACES` (default: 6)
+
+**Valid Row Requirements:**
+- Non-null and non-empty `business_name`
+- Non-null `latitude` and `longitude`
+- Non-null and non-empty `address`
+- Rows failing validation are skipped
+
+### Location Identity
+
+Locations are uniquely identified by:
+- Rounded latitude (6 decimal places)
+- Rounded longitude (6 decimal places)
+- Normalized address string
+
+### Tenancy Rules
+
+**Identity:** Each tenancy is uniquely identified by `(location_id, business_name)`.
+
+**Date Ranges:**
+- `start_date` = earliest inspection date for that business at that location
+- `end_date` = most recent inspection date
+- Dates are updated on re-runs using `LEAST`/`GREATEST` for idempotency
+
+**Current Status:**
+- `is_current = true` if `end_date` is within the last 18 months
+- Configurable via `RECENT_MONTHS` (default: 18)
+- At most one tenancy per location can be marked `is_current=true`
+- Consistency enforced after each ETL run
+
+**Source Tracking:**
+- Sources stored in JSON format
+- Includes dataset name, first/last seen dates, and inspection count
+- Example:
+  ```json
+  [{
+    "type": "seed",
+    "dataset": "king_county_food_inspections",
+    "first_seen": "2023-01-15",
+    "last_seen": "2025-08-15",
+    "inspection_count": 12
+  }]
+  ```
+
+### ETL Configuration
+
+Configure in `.env`:
+- `ROUND_PLACES=6` - Decimal places for coordinate rounding
+- `RECENT_MONTHS=18` - Months threshold for "current" tenancy status
+
 ## Environment Variables
 
 - `DATABASE_URL` - PostgreSQL connection string

@@ -59,9 +59,7 @@ class TestSupabaseLocationRepository:
         assert len(result) == 1
         assert result[0] == sample_location
 
-    async def test_find_in_bounding_box_empty_results(
-        self, repository, mock_async_session
-    ):
+    async def test_find_in_bounding_box_empty_results(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_scalars = MagicMock()
         mock_scalars.all.return_value = []
@@ -96,9 +94,7 @@ class TestSupabaseLocationRepository:
         assert result[0]["id"] == 1
         assert result[0]["current_business"] == "Joe's Coffee"
 
-    async def test_find_with_current_tenancy_respects_limit(
-        self, repository, mock_async_session
-    ):
+    async def test_find_with_current_tenancy_respects_limit(self, repository, mock_async_session):
         mock_async_session.execute.return_value = MagicMock()
 
         bbox = BoundingBox(west=-122.5, south=37.7, east=-122.4, north=37.8)

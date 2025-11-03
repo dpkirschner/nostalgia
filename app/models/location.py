@@ -25,6 +25,4 @@ class Location(Base):
         "MemorySubmission", back_populates="location", lazy="selectin"
     )
 
-    __table_args__ = (
-        Index("idx_locations_lat_lon", "lat", "lon"),
-    )
+    __table_args__ = (Index("idx_locations_lat_lon", "lat", "lon"),)

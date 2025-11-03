@@ -9,7 +9,7 @@ from app.db.base import Base
 
 class KcFoodInspection(Base):
     __tablename__ = "kc_food_inspections"
-    __table_args__ = {'schema': 'staging'}
+    __table_args__ = {"schema": "staging"}
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     business_name: Mapped[str] = mapped_column(String(255), nullable=False)

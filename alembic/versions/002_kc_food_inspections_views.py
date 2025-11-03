@@ -5,35 +5,37 @@ Revises: 001
 Create Date: 2025-01-01 01:00:00.000000
 
 """
+
 from typing import Sequence, Union
 
 from alembic import op
 import sqlalchemy as sa
 
 
-revision: str = '002'
-down_revision: Union[str, None] = '001'
+revision: str = "002"
+down_revision: Union[str, None] = "001"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     op.create_index(
-        'idx_kc_food_inspections_lat_lon',
-        'kc_food_inspections',
-        ['latitude', 'longitude'],
+        "idx_kc_food_inspections_lat_lon",
+        "kc_food_inspections",
+        ["latitude", "longitude"],
         unique=False,
-        schema='staging'
+        schema="staging",
     )
     op.create_index(
-        'idx_kc_food_inspections_inspection_date',
-        'kc_food_inspections',
-        ['inspection_date'],
+        "idx_kc_food_inspections_inspection_date",
+        "kc_food_inspections",
+        ["inspection_date"],
         unique=False,
-        schema='staging'
+        schema="staging",
     )
 
-    op.execute("""
+    op.execute(
+        """
         CREATE OR REPLACE VIEW staging.v_kc_norm AS
         SELECT
             UPPER(TRIM(business_name)) AS biz,
@@ -53,9 +55,11 @@ def upgrade() -> None:
             AND TRIM(address) != ''
             AND latitude IS NOT NULL
             AND longitude IS NOT NULL
-    """)
+    """
+    )
 
-    op.execute("""
+    op.execute(
+        """
         CREATE OR REPLACE VIEW staging.v_kc_latest AS
         SELECT DISTINCT ON (lat6, lon6, street)
             biz,
@@ -74,11 +78,18 @@ def upgrade() -> None:
             street,
             inspection_dt DESC NULLS LAST,
             row_id DESC
-    """)
+    """
+    )
 
 
 def downgrade() -> None:
     op.execute("DROP VIEW IF EXISTS staging.v_kc_latest")
     op.execute("DROP VIEW IF EXISTS staging.v_kc_norm")
-    op.drop_index('idx_kc_food_inspections_inspection_date', table_name='kc_food_inspections', schema='staging')
-    op.drop_index('idx_kc_food_inspections_lat_lon', table_name='kc_food_inspections', schema='staging')
+    op.drop_index(
+        "idx_kc_food_inspections_inspection_date",
+        table_name="kc_food_inspections",
+        schema="staging",
+    )
+    op.drop_index(
+        "idx_kc_food_inspections_lat_lon", table_name="kc_food_inspections", schema="staging"
+    )

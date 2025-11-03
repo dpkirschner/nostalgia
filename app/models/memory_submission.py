@@ -25,9 +25,7 @@ class MemorySubmission(Base):
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
 
-    location: Mapped["Location"] = relationship(
-        "Location", back_populates="memory_submissions"
-    )
+    location: Mapped["Location"] = relationship("Location", back_populates="memory_submissions")
 
     __table_args__ = (
         Index("idx_memory_submissions_location_id", "location_id"),

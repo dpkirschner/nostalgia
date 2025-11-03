@@ -10,14 +10,10 @@ from app.schemas.location import LocationDetail, LocationsResponse, PinOut
 router = APIRouter(prefix="/v1/locations", tags=["locations"])
 
 pins_returned_counter = Counter(
-    "wutbh_pins_returned_total",
-    "Total number of location pins returned"
+    "wutbh_pins_returned_total", "Total number of location pins returned"
 )
 
-detail_view_counter = Counter(
-    "wutbh_detail_view_total",
-    "Total number of location detail views"
-)
+detail_view_counter = Counter("wutbh_detail_view_total", "Total number of location detail views")
 
 
 def get_location_service(session: AsyncSession = Depends(get_db)) -> LocationService:
@@ -45,7 +41,7 @@ async def get_locations(
     except ValueError as e:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid bbox format. Expected 'west,south,east,north': {str(e)}"
+            detail=f"Invalid bbox format. Expected 'west,south,east,north': {str(e)}",
         )
 
     bounding_box = BoundingBox(west, south, east, north)
@@ -65,11 +61,7 @@ async def get_locations(
 
     pins_returned_counter.inc(len(pins))
 
-    return LocationsResponse(
-        locations=pins,
-        count=len(pins),
-        cursor=None
-    )
+    return LocationsResponse(locations=pins, count=len(pins), cursor=None)
 
 
 @router.get("/{location_id}", response_model=LocationDetail)

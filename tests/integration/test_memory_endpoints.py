@@ -12,9 +12,7 @@ class TestMemoryEndpoints:
     def mock_memory_service(self):
         return AsyncMock(spec=MemoryService)
 
-    async def test_create_memory_submission_success(
-        self, async_client, mock_memory_service
-    ):
+    async def test_create_memory_submission_success(self, async_client, mock_memory_service):
         mock_response = MemorySubmissionResponse(
             id=1,
             location_id=1,
@@ -46,9 +44,7 @@ class TestMemoryEndpoints:
         finally:
             app.dependency_overrides.clear()
 
-    async def test_create_memory_submission_minimal_data(
-        self, async_client, mock_memory_service
-    ):
+    async def test_create_memory_submission_minimal_data(self, async_client, mock_memory_service):
         mock_response = MemorySubmissionResponse(
             id=2,
             location_id=1,

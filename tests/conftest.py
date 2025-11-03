@@ -125,19 +125,19 @@ def reset_rate_limiter():
     from app.main import app
 
     for middleware in app.user_middleware:
-        if hasattr(middleware, 'kwargs') and 'dispatch' in str(middleware.cls):
+        if hasattr(middleware, "kwargs") and "dispatch" in str(middleware.cls):
             continue
 
     yield
 
     for middleware_stack in [app.middleware_stack]:
-        if middleware_stack and hasattr(middleware_stack, 'app'):
+        if middleware_stack and hasattr(middleware_stack, "app"):
             current = middleware_stack
             while current:
-                if hasattr(current, 'buckets'):
+                if hasattr(current, "buckets"):
                     current.buckets.clear()
                     break
-                current = getattr(current, 'app', None)
+                current = getattr(current, "app", None)
 
 
 @pytest.fixture
@@ -146,8 +146,6 @@ async def async_client():
 
     app.dependency_overrides.clear()
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as client:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
         yield client
         app.dependency_overrides.clear()

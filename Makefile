@@ -1,4 +1,4 @@
-.PHONY: help install test test-unit test-integration test-coverage test-watch lint lint-fix format format-check check clean docker-up docker-down docker-logs docker-restart docker-recreate docker-recreate-fg docker-clean db-migrate db-upgrade db-downgrade db-revision db-reset db-shell load-data run dev shell setup ci
+.PHONY: help install test test-unit test-integration test-coverage test-watch lint lint-fix format format-check check clean docker-up docker-down docker-logs docker-restart docker-recreate docker-recreate-fg docker-clean db-migrate db-upgrade db-downgrade db-revision db-reset db-shell load-data transform-data run dev shell setup ci
 
 .DEFAULT_GOAL := help
 
@@ -115,6 +115,9 @@ load-data: ## Load KC food inspections data
 		exit 1; \
 	fi
 	$(PYTHON) scripts/load_kc_food_inspections.py data/Food_Establishment_Inspection_Data_20251101.csv
+
+transform-data: ## Transform KC food inspections to locations and tenancies
+	$(PYTHON) scripts/transform_kc_to_tenancies.py
 
 run: ## Run the FastAPI application
 	$(UVICORN)

@@ -64,9 +64,7 @@ class TestMemoryService:
         assert result[0].status == "pending"
         mock_memory_repository.find_pending.assert_called_once_with(50)
 
-    async def test_get_pending_reviews_empty_results(
-        self, service, mock_memory_repository
-    ):
+    async def test_get_pending_reviews_empty_results(self, service, mock_memory_repository):
         mock_memory_repository.find_pending.return_value = []
 
         result = await service.get_pending_reviews(limit=50)
@@ -84,9 +82,7 @@ class TestMemoryService:
         assert result[0].location_id == 1
         mock_memory_repository.find_by_location.assert_called_once_with(1)
 
-    async def test_get_by_location_empty_results(
-        self, service, mock_memory_repository
-    ):
+    async def test_get_by_location_empty_results(self, service, mock_memory_repository):
         mock_memory_repository.find_by_location.return_value = []
 
         result = await service.get_by_location(location_id=999)

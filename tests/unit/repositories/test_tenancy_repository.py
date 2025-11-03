@@ -24,9 +24,7 @@ class TestSupabaseTenancyRepository:
         assert len(result) == 1
         assert result[0] == sample_tenancy
 
-    async def test_find_by_location_respects_limit(
-        self, repository, mock_async_session
-    ):
+    async def test_find_by_location_respects_limit(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_scalars = MagicMock()
         mock_scalars.all.return_value = []
@@ -76,9 +74,7 @@ class TestSupabaseTenancyRepository:
         assert len(result) == 1
         assert result[0] == sample_tenancy
 
-    async def test_find_by_business_name_empty_results(
-        self, repository, mock_async_session
-    ):
+    async def test_find_by_business_name_empty_results(self, repository, mock_async_session):
         mock_result = MagicMock()
         mock_scalars = MagicMock()
         mock_scalars.all.return_value = []

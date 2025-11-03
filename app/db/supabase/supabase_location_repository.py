@@ -21,9 +21,7 @@ class SupabaseLocationRepository(SupabaseRepository[Location, int], ILocationRep
         result = await self._session.execute(stmt)
         return result.scalar_one_or_none()
 
-    async def find_in_bounding_box(
-        self, bbox: BoundingBox, limit: int = 300
-    ) -> Sequence[Location]:
+    async def find_in_bounding_box(self, bbox: BoundingBox, limit: int = 300) -> Sequence[Location]:
         stmt = (
             select(self._model)
             .where(
@@ -39,7 +37,8 @@ class SupabaseLocationRepository(SupabaseRepository[Location, int], ILocationRep
     async def find_with_current_tenancy(
         self, bbox: BoundingBox, limit: int = 300
     ) -> Sequence[dict]:
-        query = text("""
+        query = text(
+            """
             SELECT
                 l.id,
                 l.lat,
@@ -53,7 +52,8 @@ class SupabaseLocationRepository(SupabaseRepository[Location, int], ILocationRep
               AND l.lon BETWEEN :west AND :east
             ORDER BY l.id
             LIMIT :limit
-        """)
+        """
+        )
 
         result = await self._session.execute(
             query,
