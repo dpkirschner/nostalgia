@@ -1,4 +1,4 @@
-.PHONY: help install test test-unit test-integration test-coverage test-watch lint lint-fix format format-check check clean docker-up docker-down docker-logs docker-restart docker-recreate docker-recreate-fg docker-clean db-migrate db-upgrade db-downgrade db-revision db-reset db-shell load-data transform-data run dev shell setup ci
+.PHONY: help install test test-unit test-integration test-coverage test-watch lint lint-fix format format-check check clean docker-up docker-down docker-logs docker-restart docker-recreate docker-recreate-fg docker-clean db-migrate db-upgrade db-downgrade db-revision db-reset db-shell load-data transform-data run dev shell setup ci web-dev web-build web-preview
 
 .DEFAULT_GOAL := help
 
@@ -134,3 +134,12 @@ setup: install docker-up db-upgrade ## Complete setup: install, start docker, an
 ci: format-check lint test ## Run all CI checks (format, lint, test)
 	@echo ""
 	@echo "✅ All CI checks passed!"
+
+web-dev: ## Run frontend dev server (requires pnpm)
+	cd web && pnpm dev
+
+web-build: ## Build frontend for production
+	cd web && pnpm build
+
+web-preview: ## Preview production build locally
+	cd web && pnpm preview

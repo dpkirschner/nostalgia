@@ -31,5 +31,18 @@ services:
       retries: 3
       start_period: 10s
 
+  web:
+    image: node:lts-alpine
+    working_dir: /app
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    command: sh -c "pnpm install && pnpm dev --host 0.0.0.0"
+    environment:
+      - NODE_ENV=development
+    restart: unless-stopped
+
 volumes:
   postgres_data:

@@ -167,3 +167,12 @@ logs/
 # Backup files
 *.bak
 *.backup
+
+# Frontend (web/)
+web/node_modules/
+web/dist/
+web/.env.local
+web/pnpm-debug.log*
+web/yarn-debug.log*
+web/yarn-error.log*
+web/.vite/
