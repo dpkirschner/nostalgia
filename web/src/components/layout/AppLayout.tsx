@@ -1,46 +1,46 @@
-import { useState, useEffect, type ReactNode } from "react";
-import { MapCanvas } from "../map/MapCanvas";
-import { Logo } from "../ui/Logo";
-import { PrimaryFAB } from "../ui/PrimaryFAB";
-import { BottomDrawer } from "../ui/BottomDrawer";
-import { GeolocationBanner } from "../ui/GeolocationBanner";
-import { GeolocationButton } from "../map/GeolocationButton";
-import { useGeolocation } from "../../hooks/useGeolocation";
-import { isOnboardingDismissed } from "../../lib/storage";
-import { getErrorMessage } from "../../lib/geolocationMessages";
-import { DEFAULT_CENTER, DEFAULT_ZOOM, USER_ZOOM } from "../../config/map";
+import { useState, useEffect, type ReactNode } from 'react'
+import { MapCanvas } from '../map/MapCanvas'
+import { Logo } from '../ui/Logo'
+import { PrimaryFAB } from '../ui/PrimaryFAB'
+import { BottomDrawer } from '../ui/BottomDrawer'
+import { GeolocationBanner } from '../ui/GeolocationBanner'
+import { GeolocationButton } from '../map/GeolocationButton'
+import { useGeolocation } from '../../hooks/useGeolocation'
+import { isOnboardingDismissed } from '../../lib/storage'
+import { getErrorMessage } from '../../lib/geolocationMessages'
+import { DEFAULT_CENTER, DEFAULT_ZOOM, USER_ZOOM } from '../../config/map'
 
 interface AppLayoutProps {
-  drawerContent?: ReactNode;
+  drawerContent?: ReactNode
 }
 
 export function AppLayout({ drawerContent }: AppLayoutProps) {
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [showBanner, setShowBanner] = useState(false);
-  const geo = useGeolocation();
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [showBanner, setShowBanner] = useState(false)
+  const geo = useGeolocation()
 
   useEffect(() => {
-    if (geo.consent === "unset" && !isOnboardingDismissed()) {
-      setShowBanner(true);
-      setDrawerOpen(true);
+    if (geo.consent === 'unset' && !isOnboardingDismissed()) {
+      setShowBanner(true)
+      setDrawerOpen(true)
     }
-  }, [geo.consent]);
+  }, [geo.consent])
 
   const mapCenter = geo.position
     ? { lat: geo.position.lat, lon: geo.position.lon }
-    : DEFAULT_CENTER;
+    : DEFAULT_CENTER
 
-  const mapZoom = geo.position ? USER_ZOOM : DEFAULT_ZOOM;
+  const mapZoom = geo.position ? USER_ZOOM : DEFAULT_ZOOM
 
   const handleBannerDismiss = () => {
-    setShowBanner(false);
-  };
+    setShowBanner(false)
+  }
 
   const drawerTitle = showBanner
-    ? "Welcome"
+    ? 'Welcome'
     : geo.error
-      ? "Location unavailable"
-      : "What used to be here?";
+      ? 'Location unavailable'
+      : 'What used to be here?'
 
   const drawerContentToShow = showBanner ? (
     <GeolocationBanner onDismiss={handleBannerDismiss} />
@@ -49,7 +49,7 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
       <p className="text-gray-700 dark:text-gray-300">
         {getErrorMessage(geo.error)}
       </p>
-      {geo.error.reason === "denied" && (
+      {geo.error.reason === 'denied' && (
         <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 p-3 rounded-lg">
           <p className="font-medium mb-1">To enable location:</p>
           <ol className="list-decimal list-inside space-y-1">
@@ -76,7 +76,7 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
         </div>
       </div>
     )
-  );
+  )
 
   return (
     <div className="relative h-screen w-screen overflow-hidden">
@@ -89,7 +89,7 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
       <GeolocationButton
         onPress={geo.requestLocation}
         isRequesting={geo.isRequesting}
-        isDenied={geo.consent === "denied"}
+        isDenied={geo.consent === 'denied'}
       />
 
       <BottomDrawer
@@ -100,5 +100,5 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
         {drawerContentToShow}
       </BottomDrawer>
     </div>
-  );
+  )
 }

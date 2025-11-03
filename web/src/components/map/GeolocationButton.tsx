@@ -1,9 +1,9 @@
-import { cn } from "../../lib/utils";
+import { cn } from '../../lib/utils'
 
 interface GeolocationButtonProps {
-  onPress: () => void;
-  isRequesting: boolean;
-  isDenied: boolean;
+  onPress: () => void
+  isRequesting: boolean
+  isDenied: boolean
 }
 
 export function GeolocationButton({
@@ -16,32 +16,32 @@ export function GeolocationButton({
       onClick={onPress}
       disabled={isRequesting}
       className={cn(
-        "fixed bottom-24 right-6 z-10",
-        "w-12 h-12",
-        "bg-white dark:bg-gray-900",
-        "border-2 border-gray-300 dark:border-gray-700",
-        "rounded-full shadow-lg",
-        "flex items-center justify-center",
-        "transition-all duration-150",
-        "hover:scale-105 hover:shadow-xl",
-        "active:scale-95",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-        isDenied && "border-red-300 dark:border-red-700"
+        'fixed bottom-24 right-6 z-10',
+        'w-12 h-12',
+        'bg-white dark:bg-gray-900',
+        'border-2 border-gray-300 dark:border-gray-700',
+        'rounded-full shadow-lg',
+        'flex items-center justify-center',
+        'transition-all duration-150',
+        'hover:scale-105 hover:shadow-xl',
+        'active:scale-95',
+        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2',
+        'disabled:opacity-50 disabled:cursor-not-allowed',
+        isDenied && 'border-red-300 dark:border-red-700'
       )}
       title={
         isDenied
-          ? "Location blocked - check settings"
+          ? 'Location blocked - check settings'
           : isRequesting
-            ? "Getting location..."
-            : "Use my location"
+            ? 'Getting location...'
+            : 'Use my location'
       }
       aria-label={
         isDenied
-          ? "Location blocked"
+          ? 'Location blocked'
           : isRequesting
-            ? "Getting location"
-            : "Use my location"
+            ? 'Getting location'
+            : 'Use my location'
       }
     >
       {isRequesting ? (
@@ -67,10 +67,10 @@ export function GeolocationButton({
       ) : (
         <svg
           className={cn(
-            "w-6 h-6",
+            'w-6 h-6',
             isDenied
-              ? "text-red-600 dark:text-red-400"
-              : "text-gray-600 dark:text-gray-400"
+              ? 'text-red-600 dark:text-red-400'
+              : 'text-gray-600 dark:text-gray-400'
           )}
           fill="none"
           stroke="currentColor"
@@ -91,5 +91,5 @@ export function GeolocationButton({
         </svg>
       )}
     </button>
-  );
+  )
 }

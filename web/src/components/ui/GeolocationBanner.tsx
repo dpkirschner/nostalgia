@@ -1,14 +1,14 @@
-import { setOnboardingDismissed } from "../../lib/storage";
+import { setOnboardingDismissed } from '../../lib/storage'
 
 interface GeolocationBannerProps {
-  onDismiss: () => void;
+  onDismiss: () => void
 }
 
 export function GeolocationBanner({ onDismiss }: GeolocationBannerProps) {
   const handleDismiss = () => {
-    setOnboardingDismissed();
-    onDismiss();
-  };
+    setOnboardingDismissed()
+    onDismiss()
+  }
 
   return (
     <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl p-4 space-y-3">
@@ -35,5 +35,5 @@ export function GeolocationBanner({ onDismiss }: GeolocationBannerProps) {
         </a>
       </div>
     </div>
-  );
+  )
 }

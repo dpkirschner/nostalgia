@@ -1,6 +1,6 @@
-import * as Dialog from "@radix-ui/react-dialog";
-import { type BottomDrawerProps } from "../../types/components";
-import { cn } from "../../lib/utils";
+import * as Dialog from '@radix-ui/react-dialog'
+import { type BottomDrawerProps } from '../../types/components'
+import { cn } from '../../lib/utils'
 
 export function BottomDrawer({
   open,
@@ -13,24 +13,24 @@ export function BottomDrawer({
       <Dialog.Portal>
         <Dialog.Overlay
           className={cn(
-            "fixed inset-0 z-20",
-            "bg-black/50 backdrop-blur-sm",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-            "transition-all duration-250"
+            'fixed inset-0 z-20',
+            'bg-black/50 backdrop-blur-sm',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'transition-all duration-250'
           )}
         />
         <Dialog.Content
           className={cn(
-            "fixed z-20",
-            "bottom-0 left-0 right-0",
-            "md:left-1/2 md:-translate-x-1/2 md:max-w-[680px]",
-            "bg-white dark:bg-gray-900",
-            "rounded-t-2xl shadow-2xl",
-            "max-h-[85vh] flex flex-col",
-            "data-[state=open]:animate-in data-[state=closed]:animate-out",
-            "data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom",
-            "transition-all duration-200"
+            'fixed z-20',
+            'bottom-0 left-0 right-0',
+            'md:left-1/2 md:-translate-x-1/2 md:max-w-[680px]',
+            'bg-white dark:bg-gray-900',
+            'rounded-t-2xl shadow-2xl',
+            'max-h-[85vh] flex flex-col',
+            'data-[state=open]:animate-in data-[state=closed]:animate-out',
+            'data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
+            'transition-all duration-200'
           )}
           aria-describedby={undefined}
         >
@@ -51,5 +51,5 @@ export function BottomDrawer({
         </Dialog.Content>
       </Dialog.Portal>
     </Dialog.Root>
-  );
+  )
 }

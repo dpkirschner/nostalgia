@@ -22,45 +22,46 @@ Using Tailwind's default spacing scale (1 unit = 0.25rem / 4px):
 
 Explicit z-index contract to prevent stacking conflicts:
 
-| Layer | Value | Usage | Tailwind Class |
-|-------|-------|-------|----------------|
-| **Map Canvas** | 0 | Background map layer | `z-0` |
-| **UI Chrome** | 10 | Logo, buttons, floating UI | `z-10` |
-| **Drawer Overlay** | 20 | Modal overlays, drawer scrim | `z-20` |
+| Layer              | Value | Usage                        | Tailwind Class |
+| ------------------ | ----- | ---------------------------- | -------------- |
+| **Map Canvas**     | 0     | Background map layer         | `z-0`          |
+| **UI Chrome**      | 10    | Logo, buttons, floating UI   | `z-10`         |
+| **Drawer Overlay** | 20    | Modal overlays, drawer scrim | `z-20`         |
 
 **Rule**: Never use arbitrary z-index values outside this contract. If you need a new layer, document it here first.
 
 ### Border Radii
 
-| Element | Value | Tailwind Class | Usage |
-|---------|-------|----------------|-------|
-| **Drawer top corners** | 16px | `rounded-t-2xl` | Bottom drawer, modal top |
-| **Card corners** | 12px | `rounded-xl` | Cards, panels |
-| **Button (pill)** | 9999px | `rounded-full` | FAB, pill buttons |
-| **Input fields** | 8px | `rounded-lg` | Form inputs |
-| **Small elements** | 6px | `rounded-md` | Chips, badges |
+| Element                | Value  | Tailwind Class  | Usage                    |
+| ---------------------- | ------ | --------------- | ------------------------ |
+| **Drawer top corners** | 16px   | `rounded-t-2xl` | Bottom drawer, modal top |
+| **Card corners**       | 12px   | `rounded-xl`    | Cards, panels            |
+| **Button (pill)**      | 9999px | `rounded-full`  | FAB, pill buttons        |
+| **Input fields**       | 8px    | `rounded-lg`    | Form inputs              |
+| **Small elements**     | 6px    | `rounded-md`    | Chips, badges            |
 
 ### Shadows
 
-| Element | Tailwind Class | Usage |
-|---------|----------------|-------|
-| **FAB** | `shadow-lg` | Floating action button (elevated) |
-| **FAB hover** | `shadow-xl` | FAB on hover (more elevated) |
-| **Drawer** | `shadow-2xl` | Bottom drawer, modals |
-| **Cards** | `shadow-md` | Content cards |
-| **Subtle elevation** | `shadow-sm` | Subtle lift |
+| Element              | Tailwind Class | Usage                             |
+| -------------------- | -------------- | --------------------------------- |
+| **FAB**              | `shadow-lg`    | Floating action button (elevated) |
+| **FAB hover**        | `shadow-xl`    | FAB on hover (more elevated)      |
+| **Drawer**           | `shadow-2xl`   | Bottom drawer, modals             |
+| **Cards**            | `shadow-md`    | Content cards                     |
+| **Subtle elevation** | `shadow-sm`    | Subtle lift                       |
 
 ### Animation & Transitions
 
-| Property | Duration | Easing | Usage |
-|----------|----------|--------|-------|
-| **Drawer slide** | 200ms | ease-out | Drawer open/close |
-| **Overlay fade** | 250ms | ease-in-out | Scrim fade in/out |
-| **Button hover** | 150ms | ease | Button scale/shadow |
-| **Button active** | 100ms | ease | Button press feedback |
-| **Focus ring** | 150ms | ease | Keyboard focus indication |
+| Property          | Duration | Easing      | Usage                     |
+| ----------------- | -------- | ----------- | ------------------------- |
+| **Drawer slide**  | 200ms    | ease-out    | Drawer open/close         |
+| **Overlay fade**  | 250ms    | ease-in-out | Scrim fade in/out         |
+| **Button hover**  | 150ms    | ease        | Button scale/shadow       |
+| **Button active** | 100ms    | ease        | Button press feedback     |
+| **Focus ring**    | 150ms    | ease        | Keyboard focus indication |
 
 **Tailwind utilities**:
+
 - `transition-all duration-200`
 - `transition-transform duration-150`
 - `transition-opacity duration-250`
@@ -70,21 +71,25 @@ Explicit z-index contract to prevent stacking conflicts:
 Using Tailwind's default color palette with semantic meaning:
 
 #### Backgrounds
+
 - **Light mode**: `bg-white`, `bg-gray-50` (subtle)
 - **Dark mode**: `bg-gray-900`, `bg-gray-800` (subtle)
 - **Backdrop blur**: `bg-white/80`, `bg-gray-900/80` (semi-transparent with blur)
 
 #### Text
+
 - **Primary text**: `text-gray-900 dark:text-gray-100`
 - **Secondary text**: `text-gray-600 dark:text-gray-400`
 - **Muted text**: `text-gray-500 dark:text-gray-500`
 
 #### Interactive
+
 - **Primary CTA**: `bg-blue-600 hover:bg-blue-700` (or brand color)
 - **Danger**: `bg-red-600 hover:bg-red-700`
 - **Success**: `bg-green-600 hover:bg-green-700`
 
 #### Overlays
+
 - **Modal scrim**: `bg-black/50` (50% opacity)
 - **Drawer scrim**: `bg-black/50 backdrop-blur-sm`
 
@@ -103,6 +108,7 @@ For UI elements overlaying the map:
 ```
 
 Provides:
+
 - Legibility over varying backgrounds
 - Modern glass-morphism aesthetic
 - Maintains map visibility
@@ -142,9 +148,7 @@ For elements positioned at screen edges, respect safe areas:
 ### Full Viewport Page
 
 ```tsx
-<div className="h-screen w-screen overflow-hidden">
-  {/* Page content */}
-</div>
+<div className="h-screen w-screen overflow-hidden">{/* Page content */}</div>
 ```
 
 Prevents body scroll and ensures viewport-filling layout.
@@ -158,7 +162,9 @@ Prevents body scroll and ensures viewport-filling layout.
 
   {/* UI Chrome - overlay layer */}
   <div className="absolute top-0 left-0 z-10">{/* Logo */}</div>
-  <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-10">{/* FAB */}</div>
+  <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-10">
+    {/* FAB */}
+  </div>
 </div>
 ```
 
@@ -173,14 +179,10 @@ Prevents body scroll and ensures viewport-filling layout.
   </div>
 
   {/* Body - scrollable */}
-  <div className="flex-1 overflow-y-auto p-4">
-    {/* Content */}
-  </div>
+  <div className="flex-1 overflow-y-auto p-4">{/* Content */}</div>
 
   {/* Footer - sticky at bottom (optional) */}
-  <div className="sticky bottom-0 bg-white border-t p-4">
-    {/* Actions */}
-  </div>
+  <div className="sticky bottom-0 bg-white border-t p-4">{/* Actions */}</div>
 </DrawerContent>
 ```
 
@@ -196,11 +198,13 @@ Prevents body scroll and ensures viewport-filling layout.
 ### Screen Readers
 
 1. **VisuallyHidden**: Use for screen-reader-only text
+
    ```tsx
    <VisuallyHidden>Descriptive label for context</VisuallyHidden>
    ```
 
 2. **ARIA labels**: All interactive regions must have labels
+
    ```tsx
    <div role="dialog" aria-labelledby="drawer-title">
      <h2 id="drawer-title">Drawer Title</h2>
@@ -270,6 +274,7 @@ import { cn } from '@/lib/utils'
 ```
 
 Benefits:
+
 - Handles conditional classes cleanly
 - Merges conflicting Tailwind classes correctly
 - Type-safe with TypeScript
