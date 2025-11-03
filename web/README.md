@@ -1,11 +1,17 @@
-# React + TypeScript + Vite
+# Nostalgia Web Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite frontend for "What Used To Be Here" - tracking business location history.
 
-Currently, two official plugins are available:
+**Stack:** React 19, TypeScript, Vite, Tailwind CSS, MapLibre GL
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Map Stack & Tiles
+
+This app uses **MapLibre GL** for interactive maps with **OpenStreetMap (OSM)** tiles.
+
+**Important:** OSM tile usage is subject to the [OSM Tile Usage Policy](https://operations.osmfoundation.org/policies/tiles/):
+- Must include proper attribution
+- Limited to light usage (testing/development)
+- For production, consider using a third-party tile provider (Mapbox, MapTiler, Stadia Maps, etc.)
 
 ## React Compiler
 
