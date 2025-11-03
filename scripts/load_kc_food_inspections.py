@@ -5,8 +5,6 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 from app.db.session import AsyncSessionLocal
 from app.models.kc_food_inspection import KcFoodInspection
 

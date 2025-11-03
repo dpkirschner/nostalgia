@@ -114,10 +114,10 @@ load-data: ## Load KC food inspections data
 		echo "Error: CSV file not found at data/Food_Establishment_Inspection_Data_20251101.csv"; \
 		exit 1; \
 	fi
-	$(PYTHON) scripts/load_kc_food_inspections.py data/Food_Establishment_Inspection_Data_20251101.csv
+	$(PYTHON) -m scripts.load_kc_food_inspections data/Food_Establishment_Inspection_Data_20251101.csv
 
 transform-data: ## Transform KC food inspections to locations and tenancies
-	$(PYTHON) scripts/transform_kc_to_tenancies.py
+	$(PYTHON) -m scripts.transform_kc_to_tenancies
 
 run: ## Run the FastAPI application
 	$(UVICORN)

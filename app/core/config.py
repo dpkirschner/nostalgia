@@ -12,6 +12,7 @@ class Settings(BaseSettings):
 
     round_places: int = 6
     recent_months: int = 18
+    outdated_tenancy_months: int = 18
 
 
 settings = Settings()
