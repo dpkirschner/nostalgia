@@ -75,20 +75,24 @@ def _normalize_address(address: Optional[str]) -> str:
 
 
 class LocationCache:
-    def __init__(self, identity_precision: int = 6):
-        self.cache: Dict[Tuple[float, float, str], int] = {}
-        self.identity_precision = identity_precision
+    def __init__(self):
+        self.cache: Dict[Tuple, int] = {}
 
-    def get(self, lat: float, lon: float, address: str) -> Optional[int]:
-        lat_rounded = round(lat, self.identity_precision)
-        lon_rounded = round(lon, self.identity_precision)
-        key = (lat_rounded, lon_rounded, _normalize_address(address))
+    def _make_key(self, lat: float, lon: float, address: str, unit: Optional[str]) -> Tuple:
+        norm_address = _normalize_address(address)
+
+        if unit:
+            norm_unit = _normalize_address(unit)
+            return ("unit", norm_address, norm_unit)
+        else:
+            return ("coord", lat, lon, norm_address)
+
+    def get(self, lat: float, lon: float, address: str, unit: Optional[str] = None) -> Optional[int]:
+        key = self._make_key(lat, lon, address, unit)
         return self.cache.get(key)
 
-    def set(self, lat: float, lon: float, address: str, location_id: int):
-        lat_rounded = round(lat, self.identity_precision)
-        lon_rounded = round(lon, self.identity_precision)
-        key = (lat_rounded, lon_rounded, _normalize_address(address))
+    def set(self, lat: float, lon: float, address: str, unit: Optional[str], location_id: int):
+        key = self._make_key(lat, lon, address, unit)
         self.cache[key] = location_id
 
     def __len__(self) -> int:
@@ -104,10 +108,10 @@ async def preload_location_cache(session: AsyncSession, cache: LocationCache):
     to prevent N+1 queries in the main loop.
     """
     logger.info("Pre-loading location cache...")
-    stmt = select(Location.id, Location.lat, Location.lon, Location.address)
+    stmt = select(Location.id, Location.lat, Location.lon, Location.address, Location.unit)
     result = await session.execute(stmt)
     for loc in result.all():
-        cache.set(loc.lat, loc.lon, loc.address, loc.id)
+        cache.set(loc.lat, loc.lon, loc.address, loc.unit, loc.id)
     logger.info(f"Pre-loaded {len(cache)} locations.")
 
 
@@ -116,26 +120,28 @@ async def get_or_create_location(
     lat: float,
     lon: float,
     address: str,
+    unit: Optional[str],
     cache: LocationCache,
     stats: TransformStats,
 ) -> int:
     """
     Gets a location ID from the cache or creates a new one.
-    The N+1 select query is removed; this function now only hits the
-    DB for *new* locations.
+    Identity is based on:
+    - (address, unit) if unit is present
+    - (lat, lon, address) if unit is absent
     """
     norm_address = _normalize_address(address)
-    cached_id = cache.get(lat, lon, norm_address)
+    cached_id = cache.get(lat, lon, norm_address, unit)
     if cached_id:
         return cached_id
 
     # Not in cache, create it
-    location = Location(lat=lat, lon=lon, address=norm_address)
+    location = Location(lat=lat, lon=lon, address=norm_address, unit=unit)
     session.add(location)
     await session.flush()  # Flush to get the new location.id
 
     stats.locations_created += 1
-    cache.set(lat, lon, norm_address, location.id)
+    cache.set(lat, lon, norm_address, unit, location.id)
     return location.id
 
 
@@ -183,8 +189,11 @@ async def group_into_tenancy_candidates(
 
         stats.valid_rows += 1
 
+        # For now, unit is always None (will be extracted in nostalgia-26)
+        unit = None
+
         location_id = await get_or_create_location(
-            session, lat, lon, street, location_cache, stats
+            session, lat, lon, street, unit, location_cache, stats
         )
 
         key = (location_id, biz)
@@ -419,7 +428,7 @@ async def generate_qa_report(session: AsyncSession, stats: TransformStats):
 
 async def transform_kc_to_tenancies(batch_size: int = 4000):
     stats = TransformStats()
-    location_cache = LocationCache(identity_precision=settings.identity_round_places)
+    location_cache = LocationCache()
 
     async with AsyncSessionLocal() as session:
         await preload_location_cache(session, location_cache)
@@ -476,7 +485,6 @@ if __name__ == "__main__":
     logger.info("KC FOOD INSPECTIONS → LOCATIONS & TENANCIES TRANSFORMATION")
     logger.info("=" * 80)
     logger.info(f"\nConfiguration:")
-    logger.info(f"  Identity round places: {settings.identity_round_places}")
     logger.info(f"  Recent months threshold: {settings.recent_months}")
     logger.info(f"  Outdated tenancy months: {settings.outdated_tenancy_months}")
     logger.info(f"  Batch size: {batch_size}")
