@@ -228,5 +228,5 @@ export function MapCanvas({
     }
   }, [pins, isMapReady])
 
-  return <div ref={mapContainerRef} className="absolute inset-0 z-0" />
+  return <div ref={mapContainerRef} className="absolute inset-0 z-0 h-full w-full" />
 }

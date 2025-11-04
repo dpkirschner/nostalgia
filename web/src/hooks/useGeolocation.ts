@@ -27,7 +27,7 @@ function isSecureContext(): boolean {
   )
 }
 
-export function useGeolocation(): GeolocationResult {
+export function useGeolocation(autoRequest: boolean = false): GeolocationResult {
   const [state, setState] = useState<GeolocationState>('idle')
   const [position, setPosition] = useState<Position | null>(null)
   const [error, setError] = useState<GeolocationError | null>(null)
@@ -136,18 +136,16 @@ export function useGeolocation(): GeolocationResult {
         )
         setPosition(lastPos)
         setState('granted')
+      }
 
-        requestLocation()
-      } else {
+      if (autoRequest) {
         requestLocation()
       }
     } else if (storedConsent === 'denied') {
       console.log('[Geo] Consent previously denied, skipping request')
       setState('denied')
-    } else {
-      requestLocation()
     }
-  }, [requestLocation])
+  }, [autoRequest, requestLocation])
 
   return {
     state,

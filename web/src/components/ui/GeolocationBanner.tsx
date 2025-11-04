@@ -13,10 +13,11 @@ export function GeolocationBanner({ onDismiss }: GeolocationBannerProps) {
   return (
     <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl p-4 space-y-3">
       <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100">
-        We use your location to tell you what used to be here.
+        Find what used to be near you
       </h3>
       <p className="text-sm text-blue-800 dark:text-blue-200">
-        It's only used to find nearby places—never stored.
+        Tap the location button to see businesses that used to be nearby. Your
+        location is only used to find places—never stored.
       </p>
       <div className="flex gap-3 pt-2">
         <button

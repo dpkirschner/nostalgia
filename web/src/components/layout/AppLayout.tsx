@@ -9,7 +9,11 @@ import { LocationDetailDrawer } from '../drawer/LocationDetailDrawer'
 import { useGeolocation } from '../../hooks/useGeolocation'
 import { useLocations } from '../../hooks/useLocations'
 import { useLocationDetail } from '../../hooks/useLocationDetail'
-import { isOnboardingDismissed } from '../../lib/storage'
+import {
+  isOnboardingDismissed,
+  hasAutoPanned,
+  setAutoPanDone,
+} from '../../lib/storage'
 import { getErrorMessage } from '../../lib/geolocationMessages'
 import {
   DEFAULT_CENTER,
@@ -37,7 +41,8 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
   )
   const [drawerView, setDrawerView] = useState<DrawerView>('timeline')
   const [mapInstance, setMapInstance] = useState<MapInstance | null>(null)
-  const geo = useGeolocation()
+  const [shouldAutoPan, setShouldAutoPan] = useState(false)
+  const geo = useGeolocation(false)
 
   const { data: locationDetail } = useLocationDetail(selectedLocationId)
 
@@ -47,12 +52,27 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
     MAX_PINS_PER_REQUEST
   )
 
+  // Disabled auto-open drawer - keep for future use
+  // useEffect(() => {
+  //   if (geo.consent === 'unset' && !isOnboardingDismissed()) {
+  //     setShowBanner(true)
+  //     setDrawerOpen(true)
+  //   }
+  // }, [geo.consent])
+
   useEffect(() => {
     if (geo.consent === 'unset' && !isOnboardingDismissed()) {
       setShowBanner(true)
-      setDrawerOpen(true)
     }
   }, [geo.consent])
+
+  // Auto-pan to user location on first successful geolocation
+  useEffect(() => {
+    if (geo.position && shouldAutoPan && !hasAutoPanned()) {
+      setShouldAutoPan(false)
+      setAutoPanDone()
+    }
+  }, [geo.position, shouldAutoPan])
 
   const mapCenter = geo.position
     ? { lat: geo.position.lat, lon: geo.position.lon }
@@ -183,7 +203,12 @@ export function AppLayout({ drawerContent }: AppLayoutProps) {
       />
 
       <GeolocationButton
-        onPress={geo.requestLocation}
+        onPress={() => {
+          if (!hasAutoPanned()) {
+            setShouldAutoPan(true)
+          }
+          geo.requestLocation()
+        }}
         isRequesting={geo.isRequesting}
         isDenied={geo.consent === 'denied'}
       />
