@@ -47,8 +47,8 @@ v_kc_norm = Table(
     Column("city", String),
     Column("state", String),
     Column("zip", String),
-    Column("lat6", Float),
-    Column("lon6", Float),
+    Column("lat", Float),
+    Column("lon", Float),
     Column("inspection_dt", Date),
     Column("row_id", Integer),
     schema="staging",
@@ -75,15 +75,20 @@ def _normalize_address(address: Optional[str]) -> str:
 
 
 class LocationCache:
-    def __init__(self):
+    def __init__(self, identity_precision: int = 6):
         self.cache: Dict[Tuple[float, float, str], int] = {}
+        self.identity_precision = identity_precision
 
     def get(self, lat: float, lon: float, address: str) -> Optional[int]:
-        key = (lat, lon, _normalize_address(address))
+        lat_rounded = round(lat, self.identity_precision)
+        lon_rounded = round(lon, self.identity_precision)
+        key = (lat_rounded, lon_rounded, _normalize_address(address))
         return self.cache.get(key)
 
     def set(self, lat: float, lon: float, address: str, location_id: int):
-        key = (lat, lon, _normalize_address(address))
+        lat_rounded = round(lat, self.identity_precision)
+        lon_rounded = round(lon, self.identity_precision)
+        key = (lat_rounded, lon_rounded, _normalize_address(address))
         self.cache[key] = location_id
 
     def __len__(self) -> int:
@@ -137,8 +142,8 @@ async def get_or_create_location(
 async def fetch_normalized_inspections(session: AsyncSession) -> List[Row]:
     """Fetches all inspection data, correctly ordered for grouping."""
     query = select(v_kc_norm).order_by(
-        v_kc_norm.c.lat6,
-        v_kc_norm.c.lon6,
+        v_kc_norm.c.lat,
+        v_kc_norm.c.lon,
         v_kc_norm.c.street,
         v_kc_norm.c.biz,
         v_kc_norm.c.inspection_dt,
@@ -172,14 +177,14 @@ async def group_into_tenancy_candidates(
     for row in inspections:
         biz = row.biz
         street = row.street
-        lat6 = float(row.lat6)
-        lon6 = float(row.lon6)
+        lat = float(row.lat)
+        lon = float(row.lon)
         inspection_dt = row.inspection_dt
 
         stats.valid_rows += 1
 
         location_id = await get_or_create_location(
-            session, lat6, lon6, street, location_cache, stats
+            session, lat, lon, street, location_cache, stats
         )
 
         key = (location_id, biz)
@@ -189,8 +194,8 @@ async def group_into_tenancy_candidates(
             candidate["location_id"] = location_id
             candidate["business_name"] = biz
             candidate["address"] = street
-            candidate["lat"] = lat6
-            candidate["lon"] = lon6
+            candidate["lat"] = lat
+            candidate["lon"] = lon
 
         if inspection_dt:
             candidate["dates"].append(inspection_dt)
@@ -414,7 +419,7 @@ async def generate_qa_report(session: AsyncSession, stats: TransformStats):
 
 async def transform_kc_to_tenancies(batch_size: int = 4000):
     stats = TransformStats()
-    location_cache = LocationCache()
+    location_cache = LocationCache(identity_precision=settings.identity_round_places)
 
     async with AsyncSessionLocal() as session:
         await preload_location_cache(session, location_cache)
@@ -471,7 +476,7 @@ if __name__ == "__main__":
     logger.info("KC FOOD INSPECTIONS → LOCATIONS & TENANCIES TRANSFORMATION")
     logger.info("=" * 80)
     logger.info(f"\nConfiguration:")
-    logger.info(f"  Round places: {settings.round_places}")
+    logger.info(f"  Identity round places: {settings.identity_round_places}")
     logger.info(f"  Recent months threshold: {settings.recent_months}")
     logger.info(f"  Outdated tenancy months: {settings.outdated_tenancy_months}")
     logger.info(f"  Batch size: {batch_size}")

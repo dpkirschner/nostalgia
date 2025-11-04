@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_format: str = "pretty"
 
-    round_places: int = 6
+    identity_round_places: int = 6
     recent_months: int = 18
     outdated_tenancy_months: int = 18
 
